@@ -1,0 +1,104 @@
+<html>
+  <body style="height: 100%; width: 100%; padding: 0; margin: 0;">
+    <canvas id="myCanvas" height="660px" width="1364px" style="border: 1px solid red; margin: 0; padding: 0;">
+    </canvas>
+  </body>
+</html>
+
+<script>
+  var c = document.getElementById("myCanvas");
+  var ctx = c.getContext("2d");
+  var circleRadius = 5;
+  var nodes = [];
+  async function drawLine(node1, node2) {
+    ctx.moveTo(node1.x,node1.y);
+    ctx.lineTo(node2.x,node2.y);
+    ctx.stroke();
+  };
+  async function drawDot(node) {
+    ctx.beginPath();
+    ctx.arc(node.x, node.y, circleRadius, 0, 2 * Math.PI);
+    ctx.fillStyle = "black";
+    ctx.fill();
+  };
+  function getRandom(top, bottom) {
+    if (!bottom)
+      bottom = 0;
+    return Math.floor((Math.random() * top - 1) + bottom);
+  };
+  function makeStartingNodes() {
+    var maxY = c.height;
+    var newNode = {};
+    var rando = getRandom(100, 98);
+    while(rando > 0) {
+      (function validateNode() {
+        newNode = {};
+        newNode.x = getRandomX();
+        newNode.y = getRandomY();
+        checkNodeIsValid(newNode, function(valid, node) {
+          if (valid)
+            nodes.push(node)
+          else
+            validateNode();
+        });
+      }());
+      rando--;
+    };
+  };
+  function getRandomX() {
+    var maxX = c.width - circleRadius;
+    return getRandom(maxX, circleRadius);
+  };
+  function getRandomY() {
+    var maxY = c.height - circleRadius;
+    return getRandom(maxY, circleRadius);
+  };
+  async function checkNodeIsValid(node, callBack) {
+    if (!node.x || !node.y)
+      callBack();
+    for(var n = 0; n < nodes.length; n++) {
+      if (calcNodeDistance(nodes[n], node) <= circleRadius * 2)
+        callBack();
+    }
+    callBack(true, node);
+  };
+  function calcNodeDistance(n1, n2) {
+    return Math.hypot(n2.x - n1.x, n2.y - n1.y);
+  };
+  
+  makeStartingNodes();
+  nodes[0].children = [];
+  (async function drawNodes() {
+    nodes.forEach(function(node) {
+      drawDot(node);
+    });
+  }());
+  (async function connectNodes() {
+    while (true) {
+      nodeToConIndex = null;
+      nodeConIndex = null;
+      for (var node = 0; node < nodes.length; node++) {
+        if (nodes[node].children) {
+          if (!nodeConIndex)
+            nodeConIndex = node;
+          for (var n = 0; n < nodes.length; n++) {
+            if (n != node && !nodes[n].children) {
+              if (!nodeToConIndex)
+                nodeToConIndex = n;
+              if (calcNodeDistance(nodes[n], nodes[node]) < calcNodeDistance(nodes[nodeToConIndex], nodes[nodeConIndex])) {
+                nodeToConIndex = n;
+                nodeConIndex = node;
+              }
+            }
+          }
+        }
+      }
+      if (nodeToConIndex === null)
+        break;
+      nodes[nodeConIndex].children.push(nodeToConIndex);
+      nodes[nodeToConIndex].children = [];
+      drawLine(nodes[nodeConIndex], nodes[nodeToConIndex]);
+    }
+  }());
+  
+</script>

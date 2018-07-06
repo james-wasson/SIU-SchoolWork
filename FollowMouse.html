@@ -1,0 +1,18 @@
+<html>
+  <body>
+    
+    <p id="ref">This is my reference<p>
+    <script>
+      document.getElementById("ref").style.position = "absolute";
+      document.addEventListener("mousemove", changeFun);
+      function changeFun(){
+        var tag = document.getElementById("ref");
+        var offSet = window.innerWidth;
+        var xPos = -(event.clientX - offSet);
+        
+        tag.style.top = event.clientY;
+        tag.style.right = xPos;
+      }
+    </script>
+  </body>
+</html>
