@@ -1,0 +1,45 @@
+<html>
+    <head>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+        <script>
+            var seqLetters = ["G", "C", "A", "T"];
+            function foreachSequence(base) {
+                var rv = [];
+                if (base.length == 0) return seqLetters.slice();
+                for (var b = 0; b < base.length; b += 1) {
+                    for (var s = 0; s < seqLetters.length; s += 1) {
+                        rv.push(base[b] + seqLetters[s]);
+                    }
+                }
+                return rv;
+            }
+            var base = [];
+            var i;
+            for (i = 0; i < seqLetters.length; i += 1) {
+                base = foreachSequence(base);
+            }
+            $().ready(function() {
+                var display = $("#display");
+                var row = null;
+                for (i = 0; i < base.length; i += 1) {
+                    if (i % 16 == 0) {
+                        row = $('<div style="display: inline-block; margin-right: 10px;"></div>')
+
+                        display.append(row);
+                    }
+                    if ((i + 1) % 64 == 0) {
+                        row.css("margin-right", "50");
+                    }
+                    var item = $('<p syle="margin-bottom: 10px">' + base[i] + '</p>');
+                    if ((i + 1) % 4 == 0) {
+                        item.css("margin-bottom", "40");
+                    }
+                    row.append(item);
+                }
+            });
+        </script>
+    </head>
+    <body>
+        <div id="display"></div>
+    </body>
+</html>
